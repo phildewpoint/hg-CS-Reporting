@@ -29,6 +29,12 @@ def launch(button):
         filelist = []
         for i in entry:
             if not i.name.startswith('.') and i.is_file():
+                # if file is csv, warn user the utility doesn't accept CSV
+                # TODO - add handling that CSV files are converted instead of errored out
+                if os.path.splitext(i)[1] == '.csv':
+                    msg = "Utility can only take Excel files. This file is a .csv: "
+                    app.infoBox(title="Critical Error", message=msg + i.name)
+                    quit()
                 file_cnt += 1
                 filelist.append(i.name)
         # create workbook
