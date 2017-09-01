@@ -20,8 +20,6 @@ def launch(button):
         msg = "You need to pick a directory to start the app."
         app.warningBox(title="ERROR: Missing Information", message=msg)
     else:
-        comp_msg = "Your workbook is complete.\n"
-        total_msg = "Spreadsheets combined: "
         direc = app.getEntry(name="find_dir")
         # check the chosen directory for # of files
         entry = os.scandir(direc)
@@ -63,9 +61,8 @@ def launch(button):
             for source_rows in rows:
                 wb_sheet.append(source_rows)
             counter += 1
-        # remove all starting sheets
         wb.save(filename=(os.path.join(direc, "CS_Compiled_Reports" + str(datetime.date.today()) + ".xlsx")))
-        app.infoBox(title="Workbook Complete!", message= comp_msg + total_msg + str(file_cnt))
+        finish_up(file_cnt=file_cnt)
         quit()
 
 
@@ -78,6 +75,15 @@ def run_app():
     app.addButtons(names=buttons, funcs=launch)
     app.go()
 
+
+def calculate():
+    quit()
+
+
+def finish_up(file_cnt):
+    comp_msg = "Your workbook is complete.\n"
+    total_msg = "Spreadsheets combined: "
+    app.infoBox(title="Workbook Complete!", message=comp_msg + total_msg + str(file_cnt))
 
 app = gui(title="CS Report Utility")
 run_app()
