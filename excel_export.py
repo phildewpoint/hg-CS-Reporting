@@ -8,9 +8,9 @@ buttons = [
     'Cancel'
 ]
 # TODO create regex to check file names per report
-fileRegex = [
-    ""
-]
+rec_activity_Regex = re.compile(
+    r'Recognition.Activity+'
+)
 
 
 def launch(button):
