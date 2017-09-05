@@ -1,8 +1,11 @@
 from appJar import gui
 import openpyxl
+from openpyxl import worksheet as ws
 import re
 import os
 import datetime
+import pandas as pd
+import numpy as np
 buttons = [
     'Go!',
     'Cancel'
@@ -11,6 +14,30 @@ buttons = [
 rec_activity_Regex = re.compile(
     r'Recognition.Activity+'
 )
+hris_report_Regex = re.compile(
+    r'Export.Members+'
+)
+app = gui(title="CS Report Utility")
+file_name = "*CS_Compiled_Reports_" + str(datetime.date.today()) + ".xlsx"
+
+
+def copy_worksheet_values(source_worksheet: ws.Worksheet, target_worksheet: ws.Worksheet):
+    """
+    Copies cell values from the source worksheet to the target worksheet
+
+
+    Keyword arguments:
+    source_worksheet -- the source (starting) worksheet to copy from
+    target_worksheet -- the target worksheet to copy data to
+    """
+    rows = []
+    for row in source_worksheet.iter_rows():
+        row_data = []
+        for cell in row:
+            row_data.append(cell.value)
+        rows.append(row_data)
+    for source_rows in rows:
+        target_worksheet.append(source_rows)
 
 
 def launch(button):
@@ -46,27 +73,14 @@ def launch(button):
             # load saved off workbook based on selected directory
             load_wb = openpyxl.load_workbook(os.path.join(direc, excel))
             # pull the active sheet
-            copy_sheet = load_wb.active
-            rows = []
-            # pull in each row
-            for row in copy_sheet.iter_rows():
-                # create list to save row data
-                row_data = []
-                # go through each cell in the row and save data
-                for cell in row:
-                    row_data.append(cell.value)
-                # add full row of data and save in master 'rows' data; loop to next row
-                rows.append(row_data)
-            # send all data to newly created sheet
-            for source_rows in rows:
-                wb_sheet.append(source_rows)
+            copy_worksheet_values(source_worksheet=load_wb.active, target_worksheet=wb_sheet)
             counter += 1
-        wb.save(filename=(os.path.join(direc, "CS_Compiled_Reports" + str(datetime.date.today()) + ".xlsx")))
+        wb.save(filename=(os.path.join(direc, file_name)))
         finish_up(file_cnt=file_cnt)
         quit()
 
 
-def run_app():
+def main():
     msg = "Runs calculations over multiple spreadsheets. Select where all the source spreadsheets are stored.\n"
     msg2 = "A spreadsheet will be created in that folder combining this data."
     app.addLabel(title="header", text=msg + msg2)
@@ -81,9 +95,10 @@ def calculate():
 
 
 def finish_up(file_cnt):
-    comp_msg = "Your workbook is complete.\n"
+    comp_msg = "Your workbook is complete.\n File named: " + file_name + '\n'
     total_msg = "Spreadsheets combined: "
     app.infoBox(title="Workbook Complete!", message=comp_msg + total_msg + str(file_cnt))
 
-app = gui(title="CS Report Utility")
-run_app()
+
+if __name__ == '__main__':
+    main()
